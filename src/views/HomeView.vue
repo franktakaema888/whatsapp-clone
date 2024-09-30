@@ -71,7 +71,7 @@ import FindFriendsView from './FindFriendsView.vue';
 import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue';
 import DotsVerticalIcon from 'vue-material-design-icons/DotsVertical.vue';
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 import { useUserStore } from '@/store/user-store'
 import { useRouter } from 'vue-router';
@@ -79,11 +79,20 @@ const router = useRouter();
 const userStore = useUserStore();
 
 let open = ref(true);
-let showFindFriends = ref(true);
+let showFindFriends = ref(false);
+
+onMounted(() => {
+    try {
+        userStore.getAllUsers();
+    } catch (error) {
+        console.log(error);
+    }
+    
+})
 
 const logout = () => {
     let res = confirm('Are you sure you want to logout?');
-    if(res) userStore.logout(); router.push('/login');
+    if(res) { userStore.logout(); router.push('/login')}
 }
 
 </script>
