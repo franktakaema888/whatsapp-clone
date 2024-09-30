@@ -2,10 +2,10 @@
     <div class="flex">
         <div id="Header" class="fixed w-[420px] z-10">
             <div class="bg-[#F0F0F0] w-full flex justify-between items-center px-3 py-2">
-                <img class="rounded-full ml-1 w-10" src="https://random.imagecdn.app/100/100" alt="Logo">
+                <img class="rounded-full ml-1 w-10" :src="userStore.picture || '' " alt="Logo">
                 <div class="flex items-center justify-center">
                     <AccountGroupIcon fillColor="#515151" class="mr-6"/>
-                    <DotsVerticalIcon fillColor="#515151" class="cursor-pointer"/>
+                    <DotsVerticalIcon @click="logout" fillColor="#515151" class="cursor-pointer"/>
                 </div>
             </div>
 
@@ -35,8 +35,12 @@
             </div>
         </div>
 
-        <ChatsView class="mt-[100px]" />
-
+        <div v-if="showFindFriends">
+            <ChatsView class="mt-[100px]" />
+        </div>
+        <div v-else>
+            <FindFriendsView class="pt-28"/>
+        </div>
         <div v-if="open">
             <MessageView />
         </div>
@@ -45,7 +49,7 @@
                 <div class="grid h-screen place-items-center">
                     <div>
                         <div class="w-full flex items-center justify-center">
-                            <img width="375 " src="https://random.imagecdn.app/400/200" alt="Logo">
+                            <img width="375 " src="/w-web-not-loaded-chat.png" alt="Logo">
                         </div>
                         <div class="text-[32px] text-gray-500 font-light mt-10">WhatsApp Web</div>
                         <div class="text-[14px] text-gray-600 mt-2">
@@ -62,12 +66,25 @@
 <script setup>
 import ChatsView from './ChatsView.vue';
 import MessageView from './MessageView.vue';
+import FindFriendsView from './FindFriendsView.vue';
+
 import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue';
 import DotsVerticalIcon from 'vue-material-design-icons/DotsVertical.vue';
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
 import { ref } from 'vue';
 
+import { useUserStore } from '@/store/user-store'
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const userStore = useUserStore();
+
 let open = ref(true);
+let showFindFriends = ref(true);
+
+const logout = () => {
+    let res = confirm('Are you sure you want to logout?');
+    if(res) userStore.logout(); router.push('/login');
+}
 
 </script>
 

@@ -5,7 +5,6 @@
       class="rounded-full mr-4 w-12" 
       src="https://random.imagecdn.app/100/100"
     >
-
     <div class="w-full">
       <div class="flex justify-between items-center">
         <div class="text-[15px] text-gray-600">
@@ -23,7 +22,6 @@
         </div>
       </div>
     </div>
-    
   </div>
 
   <div class="border-b w-[calc(100%-80px)] float-right">

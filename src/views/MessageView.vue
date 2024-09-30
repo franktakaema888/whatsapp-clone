@@ -1,6 +1,7 @@
 <template>
     <div class="ml-[420px] w-full">
         <div class="w-full">
+        <div id="BG"></div>
             <div class="border-l border-green-500 w-full">
                 <div 
                     class="
@@ -94,6 +95,12 @@ import SendIcon from 'vue-material-design-icons/Send.vue';
 
 </script>
 
-<style lang="scss" scoped>
-
+<style>
+#BG {
+    background: url('/message-bg.png') no-repeat center;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: -1;
+}
 </style>
