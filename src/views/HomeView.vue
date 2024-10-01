@@ -1,8 +1,9 @@
 <template>
     <div class="flex">
         <div id="Header" class="fixed w-[420px] z-10">
+
             <div class="bg-[#F0F0F0] w-full flex justify-between items-center px-3 py-2">
-                <img class="rounded-full ml-1 w-10" :src="userStore.picture || '' " alt="Logo">
+                <img class="rounded-full ml-1 w-10" :src="userStore.picture || '' " alt="">
                 <div class="flex items-center justify-center">
                     <AccountGroupIcon fillColor="#515151" class="mr-6"/>
                     <DotsVerticalIcon @click="logout" fillColor="#515151" class="cursor-pointer"/>
@@ -13,6 +14,7 @@
                 <div class="px-1 m-2 bg-[#F0F0F0] flex items-center justify-center rounded-md">
                     <MagnifyIcon fillColor="#515151" :size="18" class="ml-2"/>
                     <input
+                    @click="showFindFriends = !showFindFriends"
                     class="
                         ml-5
                         appearance-none
@@ -41,7 +43,8 @@
         <div v-else>
             <FindFriendsView class="pt-28"/>
         </div>
-        <div v-if="open">
+
+        <div v-if="userDataForChat.length">
             <MessageView />
         </div>
         <div v-else>
@@ -75,24 +78,32 @@ import { ref, onMounted } from 'vue';
 
 import { useUserStore } from '@/store/user-store'
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 const router = useRouter();
 const userStore = useUserStore();
+const { showFindFriends, userDataForChat } = storeToRefs(userStore);
 
-let open = ref(true);
-let showFindFriends = ref(false);
+// onMounted(() => {
+//     try {
+//         userStore.getAllUsers();
+//         console.log('userDataForChat:', userDataForChat.value); // Check the value
+//     } catch (error) {
+//         console.log(error); 
+//     }
+    
+// })
 
 onMounted(() => {
-    try {
-        userStore.getAllUsers();
-    } catch (error) {
-        console.log(error);
-    }
-    
-})
+  userStore.getAllUsers().then(() => {
+    userDataForChat.value = []; // Clear any data to simulate empty state
+  }).catch(error => {
+    console.log(error);
+  });
+});
 
 const logout = () => {
     let res = confirm('Are you sure you want to logout?');
-    if(res) { userStore.logout(); router.push('/login')}
+    if(res) userStore.logout(); router.push('/login')
 }
 
 </script>

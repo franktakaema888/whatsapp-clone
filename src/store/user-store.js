@@ -3,7 +3,15 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid'
 import { db } from '@/firebase-init'
-import { setDoc, getDoc, doc, getDocs, collection } from 'firebase/firestore'
+import { 
+	setDoc, 
+	getDoc, 
+	doc, 
+	getDocs, 
+	collection, 
+	updateDoc, 
+	arrayUnion 
+} from 'firebase/firestore'
 
 axios.defaults.baseURL = 'http://localhost:4001/'
 
@@ -14,7 +22,9 @@ export const useUserStore = defineStore('user', {
 		picture: '',
 		firstName: '',
 		lastName: '',
-		allUsers: []
+		allUsers: [],
+		userDataForChat: [],
+		showFindFriends: false
 	}),
 	actions: {
 		async getUserDetailsFromGoogle(data) {
@@ -67,12 +77,49 @@ export const useUserStore = defineStore('user', {
 			}
 		},
 
+		async sendMessage (data) {
+			try {
+				if (data.chatId) {
+					await updateDoc(doc(db, `chat/${data.chatId}`), {
+						sub1HasViewed: false,
+						sub2HasViewed: false,
+						messages: arrayUnion({
+							sub: this.sub,
+							message: data.message,
+							createdAt: Date.now()
+						})
+					})
+				} else {
+					let id = uuid()
+					await setDoc(doc(db, `chat/${id}`), {
+						sub1: this.sub,
+						sub2: data.sub2,
+						sub1HasViewed: false,
+						sub2HasViewed: false,
+						messages: [{
+							sub: this.sub,
+							message: data.message,
+							createdAt: Date.now()
+						}]
+					})
+
+					this.userDataForChat[0].id = id;
+					this.showFindFriends = false;
+				}
+			} catch {
+				console.log(error);
+			}
+		},
+
 		logout() {
 			this.sub = ''
 			this.email = ''
 			this.picture = ''
 			this.firstName = ''
 			this.lastName = ''
+			this.allUsers = []
+			this.userDataForChat = []
+			this.showFindFriends = false
 		}
 	},
 	persist: true
