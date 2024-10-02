@@ -28,17 +28,24 @@ A Full Stack WhatsApp Clone built using modern web technologies like Vue.js, Vit
    ```bash
    git clone https://github.com/your-username/whatsapp-clone.git
 2. Navigate to Project Directory
+```
 cd whatsapp-clone
+```
 3. Install Dependencies
+```
 npm install
+```
 4. Set up Firebase:
+```
 Create a Firebase project and enable authentication, Firestore, and storage.
 Set up Google Authentication in Firebase.
 Add your Firebase configuration to the project.
+```
 5. Run the development server
+```
 npm run dev (frontend)
 npm run watch (backend)
-
+```
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
