@@ -57,8 +57,9 @@
                 <div class="flex items-center justify-center">
                     <EmoticonExcitedIcon :size="27" fillColor="#515151" class="mx-1.5" />
                     <PaperclipIcon :size="27" fillColor="#515151" class="mx-1.5 mr-3" />
-
+                    
                     <input
+                    v-model="message"
                     class="
                         mr-1
                         shadow
@@ -77,7 +78,7 @@
                     placeholder="Message"
                     >
 
-                    <button class="ml-3 p-2 w-12 flex items-center justify-center">
+                    <button @click="sendMessage" class="ml-3 p-2 w-12 flex items-center justify-center">
                         <SendIcon fillColor="#515151" />
                     </button>
                 </div>
@@ -92,6 +93,21 @@ import DotsVerticalIcon from 'vue-material-design-icons/DotsVertical.vue';
 import EmoticonExcitedIcon from 'vue-material-design-icons/EmoticonExcited.vue';
 import PaperclipIcon from 'vue-material-design-icons/Paperclip.vue';
 import SendIcon from 'vue-material-design-icons/Send.vue';
+import { ref } from 'vue';
+import { useUserStore } from '../store/user-store';
+import { storeToRefs } from 'pinia';
+const userStore = useUserStore();
+const { userDataForChat } = storeToRefs(userStore);
+
+let message = ref('');
+
+const sendMessage = async () => {
+    await userStore.sendMessage({
+        message: message.value,
+        sub2: userDataForChat.value[0].sub2,
+        chatId: userDataForChat.value[0].id,
+    })
+}
 
 </script>
 

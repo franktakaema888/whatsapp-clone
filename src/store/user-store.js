@@ -24,7 +24,9 @@ export const useUserStore = defineStore('user', {
 		lastName: '',
 		allUsers: [],
 		userDataForChat: [],
-		showFindFriends: false
+		showFindFriends: false,
+		currentChat: null,
+		removeUsersFromFindFriends: [],
 	}),
 	actions: {
 		async getUserDetailsFromGoogle(data) {
@@ -76,6 +78,64 @@ export const useUserStore = defineStore('user', {
 				console.log(error);
 			}
 		},
+
+		async getChatById(id) {
+			onSnapshot(doc(db, "chat", id), (doc) => {
+				let res = [];
+				res.push(doc.data());
+				this.currentChat = res;
+			})
+		},
+
+		getAllChatsByUser() {
+			const q = query(collection(db, "chat"))
+	  
+			onSnapshot(q, (querySnapshot) => {
+			  let chatArray = []
+			  querySnapshot.forEach(doc => {
+				let data = {
+				  id: doc.id,
+				  sub1: doc.data().sub1,
+				  sub2: doc.data().sub2,
+				  sub1HasViewed: doc.data().sub1HasViewed,
+				  sub2HasViewed: doc.data().sub2HasViewed,
+				  messages: doc.data().messages
+				}
+	  
+				if (doc.data().sub1 === this.sub) chatArray.push(data)
+				if (doc.data().sub2 === this.sub) chatArray.push(data)
+	  
+				this.removeUsersFromFindFriends = []
+	  
+				chatArray.forEach(chat => {
+	  
+				  if (this.sub === chat.sub1) {
+					this.allUsers.forEach(user => {
+					  if (user.sub == chat.sub2) {
+						chat.user = user
+						this.removeUsersFromFindFriends.push(user.sub)
+					  }
+					})
+				  }
+	  
+				  if (this.sub === chat.sub2) {
+					this.allUsers.forEach(user => {
+					  if (user.sub == chat.sub1) {
+						chat.user = user
+						this.removeUsersFromFindFriends.push(user.sub)
+					  }
+					})
+				  }
+				})
+	  
+				this.chats = []
+				chatArray.forEach(chat => {
+				  this.chats.push(chat)
+				})
+	  
+			  })
+			})
+		  },
 
 		async sendMessage (data) {
 			try {
