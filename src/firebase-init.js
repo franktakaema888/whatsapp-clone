@@ -3,7 +3,7 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyD0O_w8v8o04_5ZyMAvmou7gf2gfdybwN0",
+    apiKey: "",
     authDomain: "whatsapp-clone-433b7.firebaseapp.com",
     projectId: "whatsapp-clone-433b7",
     storageBucket: "whatsapp-clone-433b7.appspot.com",

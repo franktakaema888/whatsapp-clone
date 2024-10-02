@@ -4,7 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client('1043957690546-hpireu879eul1poi10v4lb1k36elu52n.apps.googleusercontent.com');
+const client = new OAuth2Client('');
 
 app.use(bodyParser.json());
 app.use(cors());
