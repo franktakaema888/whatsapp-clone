@@ -3,7 +3,7 @@
         <div id="Header" class="fixed w-[420px] z-10">
 
             <div class="bg-[#F0F0F0] w-full flex justify-between items-center px-3 py-2">
-                <img class="rounded-full ml-1 w-10" :src="userStore.picture || '' " alt="">
+                <img class="rounded-full ml-1 w-10" :src="userStore.picture || ''" alt="logo">
                 <div class="flex items-center justify-center">
                     <AccountGroupIcon fillColor="#515151" class="mr-6"/>
                     <DotsVerticalIcon @click="logout" fillColor="#515151" class="cursor-pointer"/>
@@ -38,10 +38,10 @@
         </div>
 
         <div v-if="showFindFriends">
-            <ChatsView class="mt-[100px]" />
+            <FindFriendsView class="pt-28" />
         </div>
         <div v-else>
-            <FindFriendsView class="pt-28"/>
+            <ChatsView class="mt-[100px]" />
         </div>
 
         <div v-if="userDataForChat.length">
@@ -83,29 +83,22 @@ const router = useRouter();
 const userStore = useUserStore();
 const { showFindFriends, userDataForChat } = storeToRefs(userStore);
 
-// onMounted(() => {
-//     try {
-//         userStore.getAllUsers();
-//         console.log('userDataForChat:', userDataForChat.value); // Check the value
-//     } catch (error) {
-//         console.log(error); 
-//     }
-    
-// })
+onMounted(async () => {
+    try {
+        userStore.getAllUsers(); // Wait for this call to complete
+        await userStore.getAllChatsByUser(); // Wait for this call to complete
 
-onMounted(() => {
-  userStore.getAllUsers().then(() => {
-    userDataForChat.value = []; // Clear any data to simulate empty state
-  }).catch(error => {
-    console.log(error);
-  });
+        userDataForChat.value = []; // Clear any data to simulate empty state
+              
+    } catch (error) {
+        console.log(error); // Handle the error
+    }
 });
 
 const logout = () => {
     let res = confirm('Are you sure you want to logout?');
     if(res) userStore.logout(); router.push('/login')
 }
-
 </script>
 
 <style lang="scss" scoped>

@@ -17,9 +17,9 @@
                     "
                 >
                     <div class="flex items-center">
-                        <img class="rounded-full mx-1 w-10" src="https://random.imagecdn.app/100/100" alt="Logo">
-                        <div class="text-gray-900 ml-1 font-semibold">
-                            Frank
+                        <img v-if="userDataForChat[0] && userDataForChat[0].picture" class="rounded-full mx-1 w-10" :src="userDataForChat[0].picture" alt="Logo">
+                        <div v-if="userDataForChat[0] && userDataForChat[0].firstName" class="text-gray-900 ml-1 font-semibold">
+                            {{ userDataForChat[0].firstName }}
                         </div>
                     </div>
                     <DotsVerticalIcon fillColor="#515151"/>
@@ -38,16 +38,18 @@
                 touch-auto
             "
             >
-                <div class="px-20 text-sm">
-                    <div class="flex w-[calc(100%-50px)]">
-                        <div class="inline-block bg-white p-2 rounded-md my-1">
-                            Lorem ipsum odor amet, consectetuer adipiscing elit. Mauris augue in vulputate tempus viverra sem consectetur velit. Nulla purus magna vel; ut quam a. Orci ac conubia praesent velit purus amet habitasse.
+                <div v-if="currentChat && currentChat.length" class="px-20 text-sm">
+                    <div v-for="msg in currentChat[0].messages" :key="msg">
+                        <div v-if="msg.sub === sub" class="flex w-[calc(100%-50px)]">
+                            <div class="inline-block bg-white p-2 rounded-md my-1">
+                                {{ msg.message }}
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="flex justify-end space-x-1 w-[calc(100%-50px)] float-right">
-                        <div class="inline-block bg-green-200 p-2 rounded-md my-1">
-                            Lorem ipsum odor amet, consectetuer adipiscing elit. Mauris augue in vulputate tempus viverra sem consectetur velit. Nulla purus magna vel; ut quam a. Orci ac conubia praesent velit purus amet habitasse.
+                        <div v-else class="flex justify-end space-x-1 w-[calc(100%-50px)] float-right">
+                            <div class="inline-block bg-green-200 p-2 rounded-md my-1">
+                                {{ msg.message }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -78,7 +80,7 @@
                     placeholder="Message"
                     >
 
-                    <button @click="sendMessage" class="ml-3 p-2 w-12 flex items-center justify-center">
+                    <button :disabled="disableBtn" @click="sendMessage" class="ml-3 p-2 w-12 flex items-center justify-center">
                         <SendIcon fillColor="#515151" />
                     </button>
                 </div>
@@ -93,20 +95,57 @@ import DotsVerticalIcon from 'vue-material-design-icons/DotsVertical.vue';
 import EmoticonExcitedIcon from 'vue-material-design-icons/EmoticonExcited.vue';
 import PaperclipIcon from 'vue-material-design-icons/Paperclip.vue';
 import SendIcon from 'vue-material-design-icons/Send.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+
 import { useUserStore } from '../store/user-store';
 import { storeToRefs } from 'pinia';
 const userStore = useUserStore();
-const { userDataForChat } = storeToRefs(userStore);
+const { userDataForChat, currentChat, sub } = storeToRefs(userStore);
 
 let message = ref('');
+let disableBtn = ref(false);
+
+watch(() => currentChat.value, (chat) => {
+    if (chat.length) {
+        setTimeout(() => {
+            let objDiv = document.getElementById('MessagesSection')
+            objDiv.scrollTop = objDiv.scrollHeight
+        }, 50)
+    }
+}, { deep:true })
 
 const sendMessage = async () => {
+    if (message.value === '') return 
+    disableBtn.value = true
+    
     await userStore.sendMessage({
         message: message.value,
         sub2: userDataForChat.value[0].sub2,
         chatId: userDataForChat.value[0].id,
     })
+
+    message.value = ''
+
+    const userData = userDataForChat.value[0]
+
+    let data = {
+        id: userData.id,
+        key1: 'sub1HasViewed', val1: false, 
+        key2: 'sub2HasViewed', val2: false, 
+    }
+    if (userData.sub1 === sub.value) {
+        data.val1 = true
+        data.val2 = false
+    } else if (userData.sub2 === sub.value) {
+        data.val1 = false
+        data.val2 = true
+    }
+    await userStore.hasReadMessage(data)
+
+    let objDiv = document.getElementById('MessagesSection')
+    objDiv.scrollTop = objDiv.scrollHeight
+
+    disableBtn.value = false
 }
 
 </script>
